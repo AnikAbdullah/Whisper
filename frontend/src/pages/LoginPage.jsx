@@ -110,7 +110,7 @@ function LoginPage() {
                 />
                 <div className="mt-6 text-center">
                   <h3 className="text-xl font-medium text-cyan-400">
-                    Connect anytyme, anywhere
+                    Connect anytime, anywhere
                   </h3>
 
                   <div className="mt-4 flex justify-center gap-4">

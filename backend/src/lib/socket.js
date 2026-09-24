@@ -16,22 +16,26 @@ const io = new Server(server, {
 
 io.use(socketAuthMiddleware);
 
-export function getReceiverSocketId(userId) {
-  return userSocketMap[userId];
+export function getReceiverSocketIds(userId) {
+  return [...(userSocketMap[userId] ?? [])];
 }
 
+// userId -> Set of socket ids (one per open tab)
 const userSocketMap = {};
 
 io.on("connection", (socket) => {
   console.log("A user connected", socket.user.fullName);
   const userId = socket.userId;
-  userSocketMap[userId] = socket.id;
+  if (!userSocketMap[userId]) userSocketMap[userId] = new Set();
+  userSocketMap[userId].add(socket.id);
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("disconnect", () => {
     console.log("A user disconnected", socket.user.fullName);
-    delete userSocketMap[userId];
+    const userSockets = userSocketMap[userId];
+    userSockets.delete(socket.id);
+    if (userSockets.size === 0) delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });
