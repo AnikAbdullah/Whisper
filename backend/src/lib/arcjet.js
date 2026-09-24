@@ -1,8 +1,16 @@
-import arcjet, { shield, detectBot, slidingWindow } from "@arcjet/node";
+import arcjet, {
+  shield,
+  detectBot,
+  slidingWindow,
+  cloudflare,
+} from "@arcjet/node";
 import { ENV } from "./env.js";
 
 const aj = arcjet({
   key: ENV.ARCJET_API_KEY,
+  // Sevalla sits behind Cloudflare; read the real client IP from CF-Connecting-IP
+  // instead of treating the Cloudflare edge IP as the client (flagged as a bot).
+  proxies: [cloudflare()],
   rules: [
     shield({ mode: "LIVE" }),
     detectBot({
